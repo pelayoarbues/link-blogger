@@ -1,5 +1,6 @@
 import os
 import re
+import yaml
 from datetime import datetime, timedelta
 
 def get_recent_files(directory, days=7, exclude_patterns=None):
@@ -50,8 +51,32 @@ def parse_metadata(file_content):
                 key, value = line.split(":", 1)
                 metadata[key.strip().lower()] = value.strip().strip('"')
     
+    url_pattern = re.compile(r"- URL:\s*(https?://\S+)", re.IGNORECASE)
+    url_match = url_pattern.search(file_content)
+    if url_match:
+        metadata["url"] = url_match.group(1)
+    
     # Default values for missing metadata
     metadata["title"] = metadata.get("title", "Untitled Article")
     metadata["url"] = metadata.get("url", "#")
     
     return metadata
+
+def load_yaml_config(file_path, default_config):
+    """
+    Load configuration from a YAML file. Fallback to default_config if the file is missing or invalid.
+
+    Args:
+        file_path (str): Path to the YAML file.
+        default_config (dict): Fallback configuration.
+
+    Returns:
+        dict: Loaded configuration or the fallback.
+    """
+    if os.path.exists(file_path):
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                return yaml.safe_load(f)
+        except yaml.YAMLError:
+            print(f"Warning: Invalid YAML format in {file_path}. Using default configuration.")
+    return default_config

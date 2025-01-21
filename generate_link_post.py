@@ -7,23 +7,40 @@ from link_blogger.file_parser import get_recent_files, parse_metadata
 from link_blogger.summarizer import summarize_with_chatgpt
 from link_blogger.classifier import classify_article_with_chatgpt, load_topics
 from link_blogger.markdown_writer import save_to_markdown, generate_introduction_with_chatgpt
+import logging
+
+# Logging setup
+log_file_path = "/tmp/link_blogger.log"
+os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler(log_file_path),
+        logging.StreamHandler()
+    ]
+)
+
+logger = logging.getLogger(__name__)
 
 def main():
-    # Load environment variables from the .conf folder
+    # Load environment variables
     load_dotenv(dotenv_path=".conf/openai.conf")
 
-    # Set OpenAI API key from environment variable
+    # Set OpenAI API key
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
-        raise ValueError("OpenAI API key is not set. Please define it in the .conf/openai.conf file.")
+        logger.error("OpenAI API key is not set. Please define it in the .conf/openai.conf file.")
+        raise ValueError("OpenAI API key is not set.")
 
-    # Initialize the OpenAI client
+    # Initialize OpenAI client
     openai_client = OpenAI(api_key=api_key)
 
     parser = argparse.ArgumentParser(description="Review and summarize recent reading files.")
     parser.add_argument("directory", type=str, help="Directory containing your reading files.")
     parser.add_argument("--days", type=int, default=7, help="Number of days to review (default: 7).")
-    parser.add_argument("--output_dir", type=str, default="./summaries", help="Directory to save the Markdown file.")
+    parser.add_argument("--output_dir", type=str, default=".", help="Directory to save the Markdown file.")
     parser.add_argument("--exclude", nargs="*", help="Patterns of files to exclude.")
     args = parser.parse_args()
 
@@ -33,22 +50,27 @@ def main():
     exclude_patterns = args.exclude or ["^000", r"\.pdf$"]
 
     # Load topics
-    topics = load_topics()
+    try:
+        topics = load_topics()
+        logger.info("Topics loaded successfully.")
+    except FileNotFoundError:
+        logger.warning("No topics file found. Allowing GPT to classify freely.")
+        topics = None
 
     # Fetch recent files
-    print(f"\nSearching for files in '{directory}' modified in the last {days} days...\n")
+    logger.info(f"Searching for files in '{directory}' modified in the last {days} days...")
     recent_files = get_recent_files(directory, days, exclude_patterns)
 
     if not recent_files:
-        print("No files found.")
+        logger.warning("No files found.")
         return
 
-    print(f"Found {len(recent_files)} file(s):")
+    logger.info(f"Found {len(recent_files)} file(s):")
     for file in recent_files:
-        print(f" - {file}")
+        logger.info(f" - {file}")
 
     # Process files: summarize and classify
-    print("\nGenerating summaries and classifications...\n")
+    logger.info("Generating summaries and classifications...")
     grouped_summaries = defaultdict(list)
     article_details = []
     for file in recent_files:
@@ -62,13 +84,14 @@ def main():
             grouped_summaries[topic].append(f"- [{title}]({url}): {summary}")
             article_details.append({"title": title, "url": url, "summary": summary, "topic": topic})
 
-    # Generate introduction with OpenAI
-    print("\nGenerating introduction...\n")
+    # Generate introduction
+    logger.info("Generating introduction...")
     introduction = generate_introduction_with_chatgpt(article_details, openai_client)
 
     # Save to Markdown
-    print("Saving to Markdown file...")
+    logger.info("Saving to Markdown file...")
     save_to_markdown(grouped_summaries, introduction, output_dir)
+    logger.info("Markdown file saved successfully.")
 
 if __name__ == "__main__":
     main()

@@ -20,3 +20,14 @@ def test_classify_article_with_chatgpt(mocker):
         mock_openai,
     )
     assert result == "AI"
+
+def test_classify_article_without_topics(mocker):
+    mock_openai = mocker.MagicMock()
+    mock_openai.chat.completions.create.return_value.choices[0].message.content = "AI"
+    result = classify_article_with_chatgpt(
+        "AI in the times of Covid",
+        "AI is helping in the fight against Covid.",
+        ["AI", "Management"],  # No topics provided
+        mock_openai,
+    )
+    assert result == "AI"

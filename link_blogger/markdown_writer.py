@@ -1,6 +1,8 @@
 import os
 from datetime import datetime, timedelta
 
+from link_blogger.file_parser import load_yaml_config
+
 def generate_introduction_with_chatgpt(article_details, openai_client):
     """
     Generate an engaging introduction for the blog post using OpenAI.
@@ -12,25 +14,36 @@ def generate_introduction_with_chatgpt(article_details, openai_client):
     Returns:
         str: Generated introduction text.
     """
+    # Default configuration
+    default_config = {
+        "model": "gpt-4o",
+        "system_message": "You are a creative assistant that writes introductions for blog posts. \
+                          You are really able to get to the core of the content and provide a concise summary.",
+        "user_message": (
+            "Every week you write an update post of recent readings. Write a concise and engaging introduction for a blog post summarizing recent readings. "
+            "Provide a two sentences long introduction. Try to be really concise, consider the {topics} and the provided highlights of articles:\n\n{details}"
+        ),
+    }
+
+    # Load configuration
+    config_file = os.path.join(".conf", "introduction_prompt.yaml")
+    config = load_yaml_config(config_file, default_config)
+
+    # Prepare prompt
+    topics = ", ".join({article['topic'] for article in article_details})
+    article_context = "\n".join(
+        f"Title: {article['title']}, Topic: {article['topic']}, Summary: {article['summary']}"
+        for article in article_details
+    )
+    user_message = config["user_message"].format(topics=topics, article_context=article_context)
+
     try:
-        topics = ", ".join({article['topic'] for article in article_details})
-        article_context = "\n".join(
-            f"Title: {article['title']}, Topic: {article['topic']}, Summary: {article['summary']}"
-            for article in article_details
-        )
         completion = openai_client.chat.completions.create(
-            model="gpt-4o",
+            model=config["model"],
             messages=[
-                {"role": "developer", "content": "You are a really experienced and creative assistant that writes introductions for blog posts. \
-                                You are really able to get to the core of the content and provide a concise summary."},
-                {
-                    "role": "user",
-                    "content": (
-                        f"Every week you write an update post of recent readings."
-                        f"Provide a two sentences long introduction. Try to be really concise, use first person, consider the {topics} and the provided highlights of articles:\n\n{details}"
-                    ),
-                },
-            ]
+                {"role": "system", "content": config["system_message"]},
+                {"role": "user", "content": user_message},
+            ],
         )
         return completion.choices[0].message.content.strip()
     except Exception:

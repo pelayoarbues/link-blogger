@@ -11,10 +11,11 @@ Link Blogger is a Python project designed to streamline the process of generatin
 The purpose of Link Blogger is to help users efficiently organize and document their reading activities. It has been inspired by [Simon Willison call to share link blogs](https://simonwillison.net/2024/Dec/22/link-blog/).
 
  By analyzing recently modified files, the tool:
-1. Extracts metadata and highlights from articles or notes. Metadata includes Title and URL from Readwise's Reader highlights. 
-2. Summarizes content using OpenAI's advanced natural language processing models.
-3. Classifies articles into user-defined topics.
-4. Generates a formatted blog post in Markdown, grouped by topics and complete with an engaging introduction.
+	1.	Extracts metadata (e.g., Title and URL) and highlights from articles or notes. Metadata includes Title and URL from Readwise’s Reader highlights. If metadata is missing, the script assigns default values: "Untitled Article" for the title and "#" for the URL.
+	2.	Summarizes content using OpenAI’s advanced natural language processing models.
+	3.	Classifies articles into either user-defined topics (if provided) or GPT-suggested broad categories.
+	4.	Generates a formatted blog post in Markdown, grouped by topics and complete with an engaging introduction.
+
 
 This is ideal for bloggers, researchers, or professionals who want to share insights from their recent readings with minimal manual effort.
 
@@ -72,6 +73,7 @@ Follow these steps to set up the project:
     Management
     Economics
     ```
+    - If no topics.conf file is provided or it’s empty, GPT will classify the articles into broad categories like AI, Technology, Business, or similar.
 
 ---
 
@@ -108,6 +110,39 @@ python generate_link_post.py <directory> [--days DAYS] [--output_dir OUTPUT_DIR]
    ```bash
    python generate_link_post.py /path/to/files --output_dir ./custom_output
    ```
+
+
+### Customizing Prompts and Settings
+
+You can customize both the prompts and the OpenAI model settings using YAML configuration files. These files are located in the `.conf` folder:
+
+1. **Introduction Prompt Configuration**: `.conf/introduction_prompt.yaml`
+   - Customize the introduction-related prompt and settings.
+2. **Summarization Prompt Configuration**: `.conf/summarization_prompt.yaml`
+   - Customize the summarization-related prompt and settings.
+
+YAML Example: Introduction Prompt
+```yaml
+model: gpt-4o
+system_message: "You are a creative assistant who writes engaging introductions for blog posts."
+user_message: |
+  Write a concise and engaging introduction for a blog post summarizing recent readings. 
+  The topics covered are {topics}. Here are the details of the articles:
+
+  {article_context}
+```
+
+YAML Example: Summarization Prompt
+
+```yaml
+model: gpt-4o
+system_message: "You are a helpful assistant."
+user_message: |
+  Summarize the following text in one paragraph, using less than 500 chars. 
+  Provide the summary in English:
+
+  {content}
+```
 
 ---
 

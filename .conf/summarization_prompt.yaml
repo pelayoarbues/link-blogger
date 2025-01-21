@@ -1,0 +1,7 @@
+model: gpt-4o
+system_message: "You are a helpful assistant."
+user_message: |
+  Summarize the following text in one paragraph, using less than 500 chars. 
+  Provide the summary in English:
+
+  {content}

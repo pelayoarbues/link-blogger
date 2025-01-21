@@ -1,3 +1,5 @@
+![logo](./image/logo.webp)
+
 # Link Blogger
 
 Link Blogger is a Python project designed to streamline the process of generating concise summaries of recent readings and organizing them into a Markdown blog post. The tool automates:
@@ -27,7 +29,7 @@ To get started with Link Blogger, follow the steps below.
 
 ### Prerequisites
 
-- **Python 3.9+**: Ensure Python is installed on your system.
+- **Python 3.11+**: Ensure Python is installed on your system.
 - **Virtual Environment Management**: Use `uv` to isolate dependencies.
 - **OpenAI API Key**: You need an OpenAI account and an API key to access GPT models. Sign up [here](https://platform.openai.com/signup/).
 

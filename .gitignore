@@ -6,6 +6,10 @@ dist/
 wheels/
 *.egg-info
 
-# Virtual environments
+#Outputs
+summaries/
+
+
+# Virtual environments and env variables
 .venv
 .conf/openai.conf

@@ -87,7 +87,7 @@ The main script is `generate_link_post.py`, which processes your recent reading 
 
 Run the script using:
 ```bash
-python generate_link_post.py <directory> [--days DAYS] [--output_dir OUTPUT_DIR] [--exclude EXCLUDE_PATTERN]
+uv run generate_link_post.py <directory> [--days DAYS] [--output_dir OUTPUT_DIR] [--exclude EXCLUDE_PATTERN]
 ```
 
 #### Arguments:
@@ -100,17 +100,17 @@ python generate_link_post.py <directory> [--days DAYS] [--output_dir OUTPUT_DIR]
 
 1. **Summarize readings from the last 7 days**:
    ```bash
-   python generate_link_post.py /path/to/files
+   uv run  generate_link_post.py /path/to/files
    ```
 
 2. **Summarize readings from the last 14 days, excluding `.pdf` files**:
    ```bash
-   python generate_link_post.py /path/to/files --days 14 --exclude ".pdf$"
+   uv run  generate_link_post.py /path/to/files --days 14 --exclude ".pdf$"
    ```
 
 3. **Save output to a custom directory**:
    ```bash
-   python generate_link_post.py /path/to/files --output_dir ./custom_output
+   uv run  generate_link_post.py /path/to/files --output_dir ./custom_output
    ```
 
 

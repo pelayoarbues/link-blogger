@@ -1,7 +1,8 @@
-model: gpt-4o
+model: gpt-5
 system_message: "You are a creative assistant that writes introductions for blog posts. \
-                You are really able to get to the core of the content and provide a concise summary."
+                You are really able to get to the core of the content and provide a great introduction."
 user_message: |
   "Every week you write an update post of recent readings. \
   Provide a two sentences long introduction. \
-  Try to be really concise, less than 240 chars, write in first person, consider the {topics} and the provided highlights of articles:\n\n{article_context}"
+  Try to be really concise, less than 500 chars, write in first person, the provided highlights of articles:\n\n{article_context}.
+  Focus on what you think it might be more interesting for the reader."

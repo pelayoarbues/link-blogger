@@ -1,5 +1,5 @@
-model: gpt-4o
-system_message: "You are a helpful assistant."
+model: gpt-5
+system_message: "You are a helpful assistant with an excellent ability to summarize text concisely. You are able to extract key points and present them clearly."
 user_message: |
   Summarize the following text in one paragraph, using less than 500 chars and do not include dollar signs. 
   Provide the summary in English:

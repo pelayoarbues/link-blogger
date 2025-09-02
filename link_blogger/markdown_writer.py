@@ -69,7 +69,7 @@ def save_to_markdown(grouped_summaries, introduction, output_dir):
     filepath = os.path.join(output_dir, filename)
 
     frontmatter = f"""---
-title: Wrapped-up readings {today}
+title: Wrapped-up Readings {today}
 date: {today}
 tags:
   - link-blog
